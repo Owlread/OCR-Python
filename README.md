@@ -1,4 +1,4 @@
-# OCR Beta 0.1
+# OCR Beta 0.2
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ## Installation // วิธีการติดตั้ง
 - OpenCV (opencv-python)
