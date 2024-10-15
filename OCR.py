@@ -26,28 +26,28 @@ def select_roi(event, x, y, flags, param):
         extracted_text = " ".join([result[1] for result in results])
         print("Extracted Text: ", extracted_text)
         
-        save_text_to_file(extracted_text)
+        append_text_to_file(extracted_text)
 
+    # หมุนล้อเมาส์
     elif event == cv2.EVENT_MOUSEWHEEL:
-        if flags > 0:  
+        if flags > 0:  # Scroll ขึ้น
             scroll_y -= scroll_step
-        else:  
+        else:  # Scroll ลง
             scroll_y += scroll_step
 
-def save_text_to_file(text):
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"extracted_text_{timestamp}.txt"
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(text)
-    print(f"Text saved to {filename}")
+# ฟังก์ชันบันทึกข้อความต่อท้ายในไฟล์
+def append_text_to_file(text):
+    filename = "extracted_text.txt"
+    with open(filename, "a", encoding="utf-8") as f:
+        f.write(text + "\n\n")  # เพิ่มบรรทัดใหม่ต่อท้ายข้อความ
+    print(f"Text appended to {filename}")
 
-# เปิดไฟล์รูปภาพ
+# ฟังก์ชันเปิดไฟล์รูป
 def open_image_file():
     Tk().withdraw()
     filename = askopenfilename(title="Select Image File", filetypes=[("Image files", "*.jpg *.jpeg *.png")])
     return filename
 
-# ปรับขนาดภาพ
 def resize_image(image, max_width=800):
     height, width = image.shape[:2]
     if width > max_width:
@@ -63,7 +63,7 @@ def get_visible_image(image, scroll_y, window_height):
         scroll_y = 0
     return image[scroll_y:scroll_y + window_height], scroll_y
 
-# เลือกรูปภาพ
+# เลือกรูปภาพจากระบบ
 image_path = open_image_file()
 if image_path:
     image = cv2.imread(image_path)
@@ -74,9 +74,8 @@ if image_path:
     window_height = 600
 
     scroll_y = 0
-    scroll_step = 50 
+    scroll_step = 50  
 
-    # สร้างอ็อบเจ็กต์ EasyOCR Reader
     reader = easyocr.Reader(['en'])
 
     x_start, y_start, x_end, y_end = 0, 0, 0, 0
