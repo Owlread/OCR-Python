@@ -28,3 +28,5 @@ pip install easyocr
    - Release the mouse button to finish the selection.
 3. **OCR will extract text**: The system will display the extracted text from the selected region and save it to a `.txt` file.
 4. **Press 'q' to exit the program**: Once finished, press `q` to close the window and end the program.
+
+https://youtu.be/T-Fv02q335g?si=AtLSvZP-WuNLW-4P
