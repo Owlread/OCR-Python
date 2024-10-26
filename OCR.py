@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import easyocr
+from datetime import datetime
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
@@ -19,7 +20,6 @@ def select_roi(event, x, y, flags, param):
         x_end, y_end = x, y
         cropping = False
         roi = visible_image[y_start:y_end, x_start:x_end]
-        roi = preprocess_image(roi)
         cv2.imshow("Cropped", roi)
 
         results = reader.readtext(roi)
@@ -28,18 +28,25 @@ def select_roi(event, x, y, flags, param):
         
         append_text_to_file(extracted_text)
 
-    #หมุนล้อเมาส์
+    # Mouse wheel scrolling
     elif event == cv2.EVENT_MOUSEWHEEL:
-        if flags > 0:  # Scroll ขึ้น
+        if flags > 0:  # Scroll up
             scroll_y -= scroll_step
-        else:  # Scroll ลง
+        else:  # Scroll down
             scroll_y += scroll_step
 
+# Function to append text to a file
 def append_text_to_file(text):
     filename = "extracted_text.txt"
     with open(filename, "a", encoding="utf-8") as f:
-        f.write(text + "\n")
+        f.write(text + "\n")  # Append new line after text
     print(f"Text appended to {filename}")
+
+# Function to open image file
+def open_image_file():
+    Tk().withdraw()
+    filename = askopenfilename(title="Select Image File", filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+    return filename
 
 def resize_image(image, max_width=800):
     height, width = image.shape[:2]
@@ -56,18 +63,7 @@ def get_visible_image(image, scroll_y, window_height):
         scroll_y = 0
     return image[scroll_y:scroll_y + window_height], scroll_y
 
-def preprocess_image(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  
-    _, binary_image = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)  
-    sharpen_kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]]) 
-    sharpened = cv2.filter2D(binary_image, -1, sharpen_kernel)
-    return sharpened
-
-def open_image_file():
-    Tk().withdraw()
-    filename = askopenfilename(title="Select Image File", filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-    return filename
-
+# Select image from the system
 image_path = open_image_file()
 if image_path:
     image = cv2.imread(image_path)
@@ -75,14 +71,13 @@ if image_path:
     image = resize_image(image)
     clone = image.copy()
 
-    # กำหนดความสูงของหน้าต่างแสดงผล
     window_height = 600
 
-    # ค่าการเลื่อน
     scroll_y = 0
-    scroll_step = 50
+    scroll_step = 50  
 
-    reader = easyocr.Reader(['en'])
+    # Initialize EasyOCR reader with English and Thai languages
+    reader = easyocr.Reader(['en', 'th'])
 
     x_start, y_start, x_end, y_end = 0, 0, 0, 0
     cropping = False
